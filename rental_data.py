@@ -29,7 +29,7 @@ if __name__ == "__main__":
                 bed_bath_type_all = soup2.find_all(attrs={'class': 'SubUnit__CardInfoItem-sc-10x486s-7 hHMkFR'})
 
                 #format address
-                address = str(address[0])
+                address = str(address[0]) 
                 tmp = address.split(', ')
                 address = tmp[len(tmp)-1]
                 tmp = address.split(' ')
