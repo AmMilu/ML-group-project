@@ -2,7 +2,7 @@ import csv
 import requests
 from bs4 import BeautifulSoup
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     # Specify the corresponding URL
     id = 0
     with open('./clean_data.csv', 'w', encoding='utf-8') as fp:
