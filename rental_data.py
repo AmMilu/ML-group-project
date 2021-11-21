@@ -57,9 +57,13 @@ if __name__ == "__main__":
                         bed = bed_bath_type.split(' · ')[0].replace(' Bed', '')
                         bath = bed_bath_type.split(' · ')[1].replace(' Bath','')
                         type = bed_bath_type.split(' · ')[2]
+                        if type == 'Apartment':
+                            type = '1'
+                        else:
+                            type = '2'
                     else:
-                        bed = 1
-                        bath = 1
+                        bed = '1'
+                        bath = '1'
                         type = bed_bath_type
                     id += 1
                     row = [id, price, address, bed, bath, type]
