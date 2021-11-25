@@ -74,24 +74,3 @@ output_evaluate(ytest,ypred)
 #Mean squared error: 0.20640265523280518
 #Root mean squared error: 0.4543155899072859
 #Coefficient of determination 0.7083906018848933
-
-from sklearn.dummy import DummyClassifier
-#generates predictions by respecting the training set’s class distribution
-dummy = DummyClassifier(strategy="stratified").fit(Xtrain, ytrain)  
-ydummy = dummy.predict(Xtest)
-
-plt.scatter(ytest, ydummy)
-plt.xlim(1,7)
-plt.xlabel("ydummy")
-plt.ylim(1,7)
-plt.ylabel("ypred")
-a=np.array([1,2,3,4,5,6,7])
-plt.plot(a,a,'r')
-plt.show()
-
-output_evaluate(ytest,ydummy)
-
-#Mean absolute error: 0.8598621621621622
-#Mean squared error: 1.377223564864865
-#Root mean squared error: 1.1735516881948
-#Coefficient of determination -0.9813899309591099
