@@ -7,7 +7,7 @@ import csv
 from sklearn import metrics
 from sklearn.model_selection import cross_val_score
 import pandas as pd
-import hvplot.pandas
+# import hvplot.pandas
 import numpy as np
 import seaborn as sns
 from sklearn.model_selection import train_test_split
