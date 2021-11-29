@@ -23,7 +23,7 @@ y = df.iloc[:,1]/1000 #rent is mostly four digits, to make value smaller and eas
 
 #split data into 80% for training and 20% for testing
 from sklearn.model_selection import train_test_split
-Xtrain, Xtest, ytrain, ytest = train_test_split(X,y,test_size=0.2,shuffle=True)
+Xtrain, Xtest, ytrain, ytest = train_test_split(X,y,test_size=0.1,shuffle=True)
 
 #train training data using F-fold cross validation and Lasso regression model
 Ci_range = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60 ,70]

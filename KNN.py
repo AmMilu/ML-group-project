@@ -23,7 +23,7 @@ y = df.iloc[:,1]/1000 #rent is mostly four digits, to make value smaller and eas
 
 #split data into 80% for training and 20% for testing
 from sklearn.model_selection import train_test_split
-Xtrain, Xtest, ytrain, ytest = train_test_split(X,y,test_size=0.2,shuffle=True)
+Xtrain, Xtest, ytrain, ytest = train_test_split(X,y,test_size=0.1,shuffle=True)
 
 neighbors = [1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15]
 from sklearn.model_selection import KFold
