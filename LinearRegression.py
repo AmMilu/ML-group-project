@@ -44,11 +44,15 @@ y = rental_house.iloc[:,1]/1000
 # print(rental_house.info())
 # pd.set_option('display.max_columns', 20)  # 给最大列设置为10列
 # print(rental_house.describe())
-# sns.pairplot(rental_house)
-# sns.heatmap(rental_house.corr(), annot=True)
+col = ['price', 'address', 'bed', 'bath', 'type']
+data = pd.DataFrame(rental_house, columns=col)
+print(data)
+sns.heatmap(data.corr(), annot=True)
+sns.pairplot(data)
+plt.show()
 
 # split data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=True)
 
 # train the linear regression model
 model = LinearRegression()
