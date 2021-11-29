@@ -29,23 +29,34 @@ Xtrain, Xtest, ytrain, ytest = train_test_split(X,y,test_size=0.2,shuffle=True)
 Ci_range = [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 5, 10, 20, 30, 40, 50, 60 ,70]
 from sklearn.model_selection import KFold
 kf = KFold(n_splits=5,shuffle=True)
-mean_error = []
-std_error = []
+mean_error_mse = []
+std_error_mse = []
+mean_error_r2 = []
+std_error_r2 = []
 for Ci in Ci_range:
     from sklearn import linear_model
     alpha = 1/(2*Ci)
     model = linear_model.Lasso(alpha=alpha)
-    temp = []
+    temp_mse = []
+    temp_r2 = []
     for train, test in kf.split(Xtrain,ytrain):
         model.fit(Xtrain[train], ytrain.to_numpy()[train])
         ypred = model.predict(Xtrain[test])
-        from sklearn.metrics import mean_squared_error
-        temp.append(mean_squared_error(ytrain.to_numpy()[test],ypred))
-    mean_error.append(np.array(temp).mean())
-    std_error.append(np.array(temp).std())
+        from sklearn.metrics import mean_squared_error,r2_score
+        temp_mse.append(mean_squared_error(ytrain.to_numpy()[test],ypred))
+        temp_r2.append(r2_score(ytrain.to_numpy()[test],ypred))
+    mean_error_mse.append(np.array(temp_mse).mean())
+    std_error_mse.append(np.array(temp_mse).std())
+    mean_error_r2.append(np.array(temp_r2).mean())
+    std_error_r2.append(np.array(temp_r2).std())
 import matplotlib.pyplot as plt
-plt.errorbar(Ci_range, mean_error, yerr=std_error, linewidth=3)
+plt.errorbar(Ci_range, mean_error_mse, yerr=std_error_mse, linewidth=3)
 plt.ylabel('Mean square error')
+plt.xlabel('Ci')
+plt.show()
+
+plt.errorbar(Ci_range, mean_error_r2, yerr=std_error_r2, linewidth=3)
+plt.ylabel('R2 score')
 plt.xlabel('Ci')
 plt.show()
 
@@ -55,7 +66,7 @@ model = linear_model.Lasso(alpha=alpha)
 model.fit(Xtrain,ytrain)
 ypred = model.predict(Xtest)
 print(model.coef_)
-#[ 0.0701224   0.46132721  0.37570138 -0.46279684]
+#[ 0.07042885  0.44125777  0.40176972 -0.44564026]
 
 #on the 45 degree line, the predict value is same as the original value
 #above the line, predicted value is larger and below the line, predicted value is smaller
@@ -70,7 +81,7 @@ plt.show()
 
 output_evaluate(ytest,ypred)
 
-#Mean absolute error: 0.3396449413132823
-#Mean squared error: 0.20640265523280518
-#Root mean squared error: 0.4543155899072859
-#Coefficient of determination 0.7083906018848933
+#Mean absolute error: 0.32954025623760025
+#Mean squared error: 0.20432194909347393
+#Root mean squared error: 0.45201985475582146
+#Coefficient of determination 0.7244870491812634

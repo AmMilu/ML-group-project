@@ -28,23 +28,34 @@ Xtrain, Xtest, ytrain, ytest = train_test_split(X,y,test_size=0.2,shuffle=True)
 neighbors = [1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15]
 from sklearn.model_selection import KFold
 kf = KFold(n_splits=5,shuffle=True)
-mean_error = []
-std_error = []
+mean_error_mse = []
+std_error_mse = []
+mean_error_r2 = []
+std_error_r2 = []
 for ni in neighbors:
     from sklearn.neighbors import KNeighborsRegressor
     model = KNeighborsRegressor(n_neighbors=ni, weights="uniform")
-    temp = []
+    temp_mse = []
+    temp_r2 = []
     for train, test in kf.split(Xtrain,ytrain):
         model.fit(Xtrain[train], ytrain.to_numpy()[train])
         ypred = model.predict(Xtrain[test])
-        from sklearn.metrics import mean_squared_error
-        temp.append(mean_squared_error(ytrain.to_numpy()[test],ypred))
-    mean_error.append(np.array(temp).mean())
-    std_error.append(np.array(temp).std())
+        from sklearn.metrics import mean_squared_error,r2_score
+        temp_mse.append(mean_squared_error(ytrain.to_numpy()[test],ypred))
+        temp_r2.append(r2_score(ytrain.to_numpy()[test],ypred))
+    mean_error_mse.append(np.array(temp_mse).mean())
+    std_error_mse.append(np.array(temp_mse).std())
+    mean_error_r2.append(np.array(temp_r2).mean())
+    std_error_r2.append(np.array(temp_r2).std())
 import matplotlib.pyplot as plt
-plt.errorbar(neighbors, mean_error, yerr=std_error, linewidth=3)
+plt.errorbar(neighbors, mean_error_mse, yerr=std_error_mse, linewidth=3)
 plt.ylabel('Mean square error')
-plt.xlabel('ni')
+plt.xlabel('n')
+plt.show()
+
+plt.errorbar(neighbors, mean_error_r2, yerr=std_error_r2, linewidth=3)
+plt.ylabel('R2 score')
+plt.xlabel('n')
 plt.show()
 
 n = 4
@@ -64,3 +75,8 @@ plt.plot(a,a,'r')
 plt.show()
 
 output_evaluate(ytest,ypred)
+
+#Mean absolute error: 0.12509324324324328
+#Mean squared error: 0.045088912837837856
+#Root mean squared error: 0.2123415005076442
+#Coefficient of determination 0.9379890126640795
