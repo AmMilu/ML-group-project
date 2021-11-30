@@ -85,3 +85,31 @@ output_evaluate(y_test, y_pred)
 # plt.ylabel('predict value')
 # plt.show()
 # output_evaluate(ydummy, y_pred)
+
+# use polynomial features to train the model
+poly = PolynomialFeatures(2)
+polyX = poly.fit_transform(X)
+
+# split data
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=True)
+
+# train the linear regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+print(model.intercept_, model.coef_)
+
+# draw the y_test-y_pred picture
+plt.scatter(y_test, y_pred)
+example = np.array([1, 2, 3, 4, 5, 6, 7])
+plt.plot(example, example, color='red')
+plt.xlim(1, 7)
+plt.ylim(1, 7)
+plt.xlabel('target value')
+plt.ylabel('predict value')
+plt.show()
+
+# output the evaluation
+scores = cross_val_score(model, X_test, y_test, cv=5)
+print("Cross Validation Score:", scores.mean())
+output_evaluate(y_test, y_pred)
