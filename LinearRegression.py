@@ -3,20 +3,15 @@
 # @Author : Kiser
 # @File : LinearRegression.py
 # @Software : PyCharm
-import csv
 from sklearn import metrics
-from sklearn.model_selection import cross_val_score
 import pandas as pd
-# import hvplot.pandas
 import numpy as np
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
-from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import PolynomialFeatures
 
 
 def output_evaluate(target_value, predict_value):
@@ -44,12 +39,12 @@ y = rental_house.iloc[:,1]/1000
 # print(rental_house.info())
 # pd.set_option('display.max_columns', 20)  # 给最大列设置为10列
 # print(rental_house.describe())
-col = ['price', 'address', 'bed', 'bath', 'type']
-data = pd.DataFrame(rental_house, columns=col)
-print(data)
-sns.heatmap(data.corr(), annot=True)
-sns.pairplot(data)
-plt.show()
+# col = ['price', 'address', 'bed', 'bath', 'type']
+# data = pd.DataFrame(rental_house, columns=col)
+# print(data)
+# sns.heatmap(data.corr(), annot=True)
+# sns.pairplot(data)
+# plt.show()
 
 # split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=True)
