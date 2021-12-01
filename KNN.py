@@ -1,4 +1,11 @@
 from sklearn import metrics
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split, KFold
+from sklearn.neighbors import KNeighborsRegressor
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+
 def output_evaluate(target_value, predict_value):
     mean_absolute_error = metrics.mean_absolute_error(target_value, predict_value)
     mean_square_error = metrics.mean_squared_error(target_value, predict_value)
@@ -11,8 +18,6 @@ def output_evaluate(target_value, predict_value):
     print('------------------------------------------------------------')
 
 #read data
-import numpy as np
-import pandas as pd
 df = pd.read_csv('updated_data.csv', header=0)
 #print(df.head()) #return first 5 rows
 X1_addressCode = df.iloc[:,2]
@@ -23,7 +28,6 @@ X = np.column_stack((X1_addressCode,X2_BedNum,X3_BathNum,X4_type))
 y = df.iloc[:,1]/1000 #rent is mostly four digits, to make value smaller and easier to read, divided price by 1000
 
 #split data into 80% for training and 20% for testing
-from sklearn.model_selection import train_test_split
 Xtrain, Xtest, ytrain, ytest = train_test_split(X,y,test_size=0.1,shuffle=True)
 
 def gaussian_kernel1(distances):
@@ -61,66 +65,46 @@ def gaussian_kernel1000(distances):
 gaussian_kernel = [gaussian_kernel1, gaussian_kernel5, gaussian_kernel10, gaussian_kernel50, gaussian_kernel100, gaussian_kernel500, gaussian_kernel1000]
 g = [1,5,10,50,100,500,1000]
 
-neighbors = [1, 2, 3, 4, 5, 6, 7, 8, 9,10, 11, 12, 13, 14, 15]
-from sklearn.model_selection import KFold
+neighbors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
 kf = KFold(n_splits=5,shuffle=True)
-uniform = False
+plt.rc('font',size=18)
 #weights = gaussian
 for i in range(len(gaussian_kernel)):
     mean_error_mse = []
     std_error_mse = []
-    mean_error_r2 = []
-    std_error_r2 = []
     for ni in neighbors:
-        from sklearn.neighbors import KNeighborsRegressor
         model = KNeighborsRegressor(n_neighbors=ni, weights=gaussian_kernel[i])
         temp_mse = []
         temp_r2 = []
         for train, test in kf.split(Xtrain,ytrain):
             model.fit(Xtrain[train], ytrain.to_numpy()[train])
             ypred = model.predict(Xtrain[test])
-            from sklearn.metrics import mean_squared_error,r2_score
             temp_mse.append(mean_squared_error(ytrain.to_numpy()[test],ypred))
-            temp_r2.append(r2_score(ytrain.to_numpy()[test],ypred))
         mean_error_mse.append(np.array(temp_mse).mean())
         std_error_mse.append(np.array(temp_mse).std())
-        mean_error_r2.append(np.array(temp_r2).mean())
-        std_error_r2.append(np.array(temp_r2).std())
-    import matplotlib.pyplot as plt
     plt.errorbar(neighbors, mean_error_mse, yerr=std_error_mse, linewidth=3, label="Gamma = "+str(g[i]))
 plt.ylabel('Mean square error')
-plt.xlabel('n')
+plt.xlabel('K')
 plt.legend()
+plt.title("K vs Mean squared error with different Gamma value")
 plt.show()
 
 mean_error_mse = []
 std_error_mse = []
-mean_error_r2 = []
-std_error_r2 = []
 for w in gaussian_kernel:
-    from sklearn.neighbors import KNeighborsRegressor
     model = KNeighborsRegressor(n_neighbors=6, weights=w)
     temp_mse = []
-    temp_r2 = []
     for train, test in kf.split(Xtrain,ytrain):
         model.fit(Xtrain[train], ytrain.to_numpy()[train])
         ypred = model.predict(Xtrain[test])
-        from sklearn.metrics import mean_squared_error,r2_score
         temp_mse.append(mean_squared_error(ytrain.to_numpy()[test],ypred))
-        temp_r2.append(r2_score(ytrain.to_numpy()[test],ypred))
     mean_error_mse.append(np.array(temp_mse).mean())
     std_error_mse.append(np.array(temp_mse).std())
-    mean_error_r2.append(np.array(temp_r2).mean())
-    std_error_r2.append(np.array(temp_r2).std())
-import matplotlib.pyplot as plt
 plt.errorbar(g, mean_error_mse, yerr=std_error_mse, linewidth=3)
 plt.ylabel('Mean square error')
-plt.xlabel('n')
-plt.show()
-
-plt.errorbar(g, mean_error_r2, yerr=std_error_r2, linewidth=3)
-plt.ylabel('R2 score')
-plt.xlabel('n')
+plt.xlabel('Gamma')
+plt.title('Gamma value vs Mean squared error')
 plt.show()
 
 n = 6
@@ -131,90 +115,59 @@ ypred = model.predict(Xtest)
 
 #on the 45 degree line, the predict value is same as the original value
 #above the line, predicted value is larger and below the line, predicted value is smaller
-plt.scatter(ytest, ypred)
-plt.xlim(1,7)
-plt.xlabel("ytest")
-plt.ylim(1,7)
-plt.ylabel("ypred")
-a=np.array([1,2,3,4,5,6,7])
-plt.plot(a,a,'r')
-plt.show()
-print('n = 6, Gaussian weight = 50:')
+#plt.scatter(ytest, ypred)
+#plt.xlim(1,7)
+#plt.xlabel("ytest")
+#plt.ylim(1,7)
+#plt.ylabel("ypred")
+#a=np.array([1,2,3,4,5,6,7])
+#plt.plot(a,a,'r')
+#plt.show()
+print('k = 6, Gaussian weight = 50:')
 output_evaluate(ytest,ypred)
+
+#Mean absolute error: 0.12669909909909924
+#Mean squared error: 0.04868442522522523
+#Root mean squared error: 0.22064547406467513
+#Coefficient of determination 0.9337138515197461
 
 #weights = uniform 
 mean_error_mse = []
 std_error_mse = []
-mean_error_r2 = []
-std_error_r2 = []
 for ni in neighbors:
-    from sklearn.neighbors import KNeighborsRegressor
     model = KNeighborsRegressor(n_neighbors=ni, weights="uniform")
     temp_mse = []
-    temp_r2 = []
     for train, test in kf.split(Xtrain,ytrain):
         model.fit(Xtrain[train], ytrain.to_numpy()[train])
         ypred = model.predict(Xtrain[test])
-        from sklearn.metrics import mean_squared_error,r2_score
         temp_mse.append(mean_squared_error(ytrain.to_numpy()[test],ypred))
-        temp_r2.append(r2_score(ytrain.to_numpy()[test],ypred))
     mean_error_mse.append(np.array(temp_mse).mean())
     std_error_mse.append(np.array(temp_mse).std())
-    mean_error_r2.append(np.array(temp_r2).mean())
-    std_error_r2.append(np.array(temp_r2).std())
-import matplotlib.pyplot as plt
 plt.errorbar(neighbors, mean_error_mse, yerr=std_error_mse, linewidth=3)
 plt.ylabel('Mean square error')
-plt.xlabel('n')
+plt.xlabel('K')
+plt.title('K vs Mean squared error (uniform weights)')
 plt.show()
 
-plt.errorbar(neighbors, mean_error_r2, yerr=std_error_r2, linewidth=3)
-plt.ylabel('R2 score')
-plt.xlabel('n')
-plt.show()
-
-n = 4
+n = 5
 model = KNeighborsRegressor(n_neighbors=n, weights = "uniform")
 model.fit(Xtrain,ytrain)
 ypred = model.predict(Xtest)
 
 #on the 45 degree line, the predict value is same as the original value
 #above the line, predicted value is larger and below the line, predicted value is smaller
-plt.scatter(ytest, ypred)
-plt.xlim(1,7)
-plt.xlabel("ytest")
-plt.ylim(1,7)
-plt.ylabel("ypred")
-a=np.array([1,2,3,4,5,6,7])
-plt.plot(a,a,'r')
-plt.show()
-print("n=4, weights = uniform:")
+#plt.scatter(ytest, ypred)
+#plt.xlim(1,7)
+#plt.xlabel("ytest")
+#plt.ylim(1,7)
+#plt.ylabel("ypred")
+#a=np.array([1,2,3,4,5,6,7])
+#plt.plot(a,a,'r')
+#plt.show()
+print("k=5, weights = uniform:")
 output_evaluate(ytest,ypred)
 
-#Mean absolute error: 0.12509324324324328
-#Mean squared error: 0.045088912837837856
-#Root mean squared error: 0.2123415005076442
-#Coefficient of determination 0.9379890126640795
-
-n = 6
-model = KNeighborsRegressor(n_neighbors=n, weights = "uniform")
-model.fit(Xtrain,ytrain)
-ypred = model.predict(Xtest)
-
-#on the 45 degree line, the predict value is same as the original value
-#above the line, predicted value is larger and below the line, predicted value is smaller
-plt.scatter(ytest, ypred)
-plt.xlim(1,7)
-plt.xlabel("ytest")
-plt.ylim(1,7)
-plt.ylabel("ypred")
-a=np.array([1,2,3,4,5,6,7])
-plt.plot(a,a,'r')
-plt.show()
-print("n=6, weights = uniform:")
-output_evaluate(ytest,ypred)
-
-#Mean absolute error: 0.12509324324324328
-#Mean squared error: 0.045088912837837856
-#Root mean squared error: 0.2123415005076442
-#Coefficient of determination 0.9379890126640795
+#Mean absolute error: 0.12952972972972976
+#Mean squared error: 0.06007441621621623
+#Root mean squared error: 0.24510082867305086
+#Coefficient of determination 0.9182058398604775
