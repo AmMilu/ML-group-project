@@ -6,6 +6,7 @@ from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 from sklearn import metrics
+from sklearn.preprocessing import PolynomialFeatures
 
 # start ---- read and split data
 df = pandas.read_csv('updated_data.csv', header=0)
@@ -17,13 +18,16 @@ X4_type = df.iloc[:, 5]
 X = numpy.column_stack((X1_addressCode, X2_BedNum, X3_BathNum, X4_type))
 y_price = numpy.array(df.iloc[:, 1] / 1000)  # use thousand as unit
 # split out 10% use as final test and evaluate data
+X = PolynomialFeatures(2).fit_transform(X)
 Xtrain, Xtest, ytrain, ytest = train_test_split(X, y_price, test_size=0.1)
 # end ---- read and split data
+
 
 # start ---- select C using cross validation
 mean_error = []
 std_error = []
-Ci_range = [0.001, 0.005, 0.01, 0.03, 0.05, 0.07, 0.09, 0.1]
+# Ci_range = [0.001, 0.005, 0.01, 0.03, 0.05, 0.07, 0.09, 0.1]
+Ci_range = [0.001, 0.005, 0.01, 0.03, 0.05, 0.07, 0.09, 0.1, 0.3, 0.5, 0.7, 0.9, 1]
 for Ci in Ci_range:
     squared_error = []
     kf = KFold(n_splits=5)
@@ -45,7 +49,8 @@ plt.ylabel("Mean square error")
 plt.show()
 # end ---- select C using cross validation
 
-C = 0.05
+# C = 0.05  # best C value for original Ridge Regression
+C = 0.5  # best C value for Ridge Regression with poly (2)
 RidgeModel = Ridge(alpha=1 / (2 * C)).fit(Xtrain, ytrain)
 ypred = RidgeModel.predict(Xtest)
 plt.scatter(ytest, ypred)
